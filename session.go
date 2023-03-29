@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"gitee.com/chunanyong/dm"
 	"xorm.io/core"
 )
 
@@ -22,6 +23,13 @@ type sessionType int
 const (
 	engineSession sessionType = iota
 	groupSession
+)
+
+const (
+	TINYTEXT   int = 256
+	TEXT       int = 65535
+	MEDIUMTEXT int = 16777215
+	LONGTEXT   int = 4294967295
 )
 
 // Session keep a pointer to sql.DB and provides all execution of all
@@ -567,6 +575,15 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 			if rawValueType.Kind() == reflect.String {
 				hasAssigned = true
 				fieldValue.SetString(vv.String())
+			} else if rawValueType.Kind() == reflect.Ptr {
+				if vv.CanInterface() {
+					// reflect from dm.DmClob to string
+					if clob, ok := vv.Interface().(*dm.DmClob); ok {
+						str, _ := clob.ReadString(1, MEDIUMTEXT)
+						fieldValue.SetString(str)
+
+					}
+				}
 			}
 		case reflect.Bool:
 			if rawValueType.Kind() == reflect.Bool {

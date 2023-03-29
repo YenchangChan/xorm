@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"gitee.com/chunanyong/dm"
 	"xorm.io/builder"
 	"xorm.io/core"
 )
@@ -125,6 +126,13 @@ func value2String(rawValue *reflect.Value) (str string, err error) {
 		str = strconv.FormatBool(vv.Bool())
 	case reflect.Complex128, reflect.Complex64:
 		str = fmt.Sprintf("%v", vv.Complex())
+	case reflect.Ptr:
+		if vv.CanInterface() {
+			// reflect from dm.DmClob to string
+			if clob, ok := vv.Interface().(*dm.DmClob); ok {
+				str, _ = clob.ReadString(1, MEDIUMTEXT)
+			}
+		}
 	/* TODO: unsupported types below
 	   case reflect.Map:
 	   case reflect.Ptr:
