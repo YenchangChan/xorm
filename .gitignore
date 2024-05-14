@@ -31,3 +31,4 @@ xorm.test
 test.db.sql
 
 .idea/
+vendor

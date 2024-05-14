@@ -19,7 +19,13 @@ func (engine *Engine) tbNameWithSchema(v string) string {
 	if engine.dialect.DBType() == core.POSTGRES &&
 		engine.dialect.URI().Schema != "" &&
 		engine.dialect.URI().Schema != postgresPublicSchema &&
-		strings.Index(v, ".") == -1 {
+		!strings.Contains(v, ".") {
+		return engine.dialect.URI().Schema + "." + v
+	}
+	if engine.dialect.DBType() == OPENGAUSS &&
+		engine.dialect.URI().Schema != "" &&
+		engine.dialect.URI().Schema != opengaussPublicSchema &&
+		!strings.Contains(v, ".") {
 		return engine.dialect.URI().Schema + "." + v
 	}
 	return v
